@@ -18,7 +18,7 @@ impl UserRepository {
             r#"
             INSERT INTO users (username)
             VALUES ($1)
-            RETURNING id, username
+            RETURNING id, username, password
             "#,
             user_data.username,
         )
@@ -57,7 +57,7 @@ impl UserRepository {
     ) -> Result<Vec<User>, UserError> {
         let result = sqlx::query_as!(
             User,
-            "SELECT id, username FROM users"
+            "SELECT id, username, password FROM users"
         )
         .fetch_all(pool)
         .await;
@@ -82,7 +82,7 @@ impl UserRepository {
     ) -> Result<User, UserError> {
         let result = sqlx::query_as!(
             User,
-            "SELECT id, username FROM users WHERE id = $1",
+            "SELECT id, username, password FROM users WHERE id = $1",
             user_id
         )
         .fetch_optional(pool)
@@ -115,9 +115,10 @@ impl UserRepository {
     ) -> Result<User, UserError> {
         let result = sqlx::query_as!(
             User,
-            "UPDATE users SET username = $1 WHERE id = $2 RETURNING id, username",
+            "UPDATE users SET username = $1, password = $3 WHERE id = $2 RETURNING id, username, password",
             user_data.username,
-            user_id
+            user_id,
+            user_data.password,
         )
         .fetch_optional(pool)
         .await;
