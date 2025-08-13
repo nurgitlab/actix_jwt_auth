@@ -46,6 +46,7 @@ async fn main() -> std::io::Result<()> {
             .service(get_ping_pong)
             .configure(handlers::user_handler::users_routes)
             .configure(handlers::cookie_handler::cookie_routes)
+            .configure(handlers::post_handler::posts_routes)
     })
     .bind(("127.0.0.1", 3030))?
     .run()

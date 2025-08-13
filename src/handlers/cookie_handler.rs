@@ -1,5 +1,5 @@
 use crate::{
-     erros::cookie_errors::CookieError, models::cookie_models::{CookiePath, CookieResponse}
+     erros::{cookie_errors::CookieError}, models::cookie_models::{CookiePath, CookieResponse}
 };
 use actix_web::{
     cookie::{time::Duration, Cookie}, get, web::{Data, Path, ServiceConfig}, HttpResponse, Result

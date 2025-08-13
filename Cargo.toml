@@ -17,13 +17,14 @@ strum = {version = "0.27.2", features = ["derive"]}
 derive_more = "2.0.1"
 dotenv = "0.15"
 
-sqlx = { version = "0.8.0", features = ["postgres", "runtime-tokio-native-tls"] }
+sqlx = { version = "0.8.0", features = ["postgres", "runtime-tokio-native-tls", "time"] }
 tokio = { version = "1.0", features = ["full"] }
 
-anyhow = "1.0"
+anyhow = "1.0.99"
 
 validator = { version = "0.16.1", features = ["derive"] }
 thiserror = { version = "2.0.12"}
+time = { version = "0.3", features = ["serde", "parsing", "formatting"] }
 
 [lints]
 clippy.all = "warn"
