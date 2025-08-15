@@ -1,11 +1,16 @@
 use crate::{
-    erros::post_errors::PostError, models::posts_models::{CreatePost, DeletePost, GetAllPosts, GetPost, UpdatePost}, repositories::{posts_repository::PostsRepository, user_repository::UserRepository}
+    erros::posts_errors::PostError,
+    models::posts_models::{
+        CreatePost, DeletePost, GetAllPosts, GetPost, UpdatePost,
+    },
+    repositories::{
+        posts_repository::PostsRepository, user_repository::UserRepository,
+    },
 };
 use actix_web::{
     HttpResponse, Result, delete, get, post, put,
     web::{Data, Json, Path, ServiceConfig},
 };
-use serde::de;
 use sqlx::PgPool;
 use validator::Validate;
 
@@ -61,7 +66,6 @@ async fn delete_post(
     post_data: Json<DeletePost>,
     pool: Data<PgPool>,
 ) -> Result<HttpResponse, PostError> {
-
     PostsRepository::delete(&pool, post_data.id).await?;
     Ok(HttpResponse::Ok().json(()))
 }

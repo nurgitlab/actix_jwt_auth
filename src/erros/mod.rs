@@ -1,3 +1,3 @@
-pub mod user_errors;
-pub mod cookie_errors;
-pub mod post_errors;
+pub mod cookies_errors;
+pub mod posts_errors;
+pub mod users_errors;

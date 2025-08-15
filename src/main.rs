@@ -1,8 +1,8 @@
+mod erros;
 mod handlers;
 mod migrations;
 mod models;
 mod repositories;
-mod erros;
 use std::env;
 
 use actix_web::{App, HttpServer, middleware::Logger, web::Data};
@@ -44,9 +44,9 @@ async fn main() -> std::io::Result<()> {
             .wrap(logger)
             .app_data(Data::new(pool.clone()))
             .service(get_ping_pong)
-            .configure(handlers::user_handler::users_routes)
-            .configure(handlers::cookie_handler::cookie_routes)
-            .configure(handlers::post_handler::posts_routes)
+            .configure(handlers::users_handler::users_routes)
+            .configure(handlers::cookies_handler::cookie_routes)
+            .configure(handlers::posts_handler::posts_routes)
     })
     .bind(("127.0.0.1", 3030))?
     .run()

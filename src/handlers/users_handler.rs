@@ -1,5 +1,7 @@
 use crate::{
-    erros::user_errors::UserError, models::user_models::{CreateUser, UpdateUser, UserPath}, repositories::user_repository::UserRepository
+    erros::users_errors::UserError,
+    models::users_models::{CreateUser, UpdateUser, UserPath},
+    repositories::user_repository::UserRepository,
 };
 use actix_web::{
     HttpResponse, Result, delete, get, post, put,
@@ -14,9 +16,7 @@ pub async fn create_user(
     pool: Data<PgPool>,
 ) -> Result<HttpResponse, UserError> {
     user_data.validate().map_err(UserError::Validation)?;
-
     let user = UserRepository::create(&pool, user_data.into_inner()).await?;
-
     Ok(HttpResponse::Ok().json(user))
 }
 

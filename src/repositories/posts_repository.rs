@@ -1,5 +1,5 @@
 use crate::{
-    erros::post_errors::PostError, models::posts_models::{CreatePost, Post, UpdatePost}
+    erros::posts_errors::PostError, models::posts_models::{CreatePost, Post, UpdatePost}
 };
 use anyhow::Result;
 use sqlx::PgPool;

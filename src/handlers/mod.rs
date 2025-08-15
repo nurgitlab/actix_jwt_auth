@@ -1,4 +1,4 @@
+pub mod cookies_handler;
 pub mod ping_pong_handler;
-pub mod user_handler;
-pub mod cookie_handler;
-pub mod post_handler;
+pub mod posts_handler;
+pub mod users_handler;
