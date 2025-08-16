@@ -1,3 +1,4 @@
+mod auth;
 mod erros;
 mod handlers;
 mod migrations;
@@ -9,10 +10,8 @@ use actix_web::{App, HttpServer, middleware::Logger, web::Data};
 
 use sqlx::postgres::PgPoolOptions;
 
-use crate::{
-    handlers::ping_pong_handler::get_ping_pong,
-    migrations::apply_migrations::apply_migrations,
-};
+use crate::{auth::jwt::{create_jwt::create_jwt, decode_jwt::decode_jwt}, handlers::ping_pong_handler::get_ping_pong, migrations::apply_migrations::apply_migrations};
+
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -37,6 +36,20 @@ async fn main() -> std::io::Result<()> {
         .expect("Failed to create pool");
 
     apply_migrations(&pool).await.expect("Failed to apply migrations");
+
+    println!("-----");
+    //eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InRlc3RfdXNlciIsImV4cCI6MTc1NTM2NTU1N30.JrPuYJAov5JMRVdKFM1-QIIB4fbe0CKgWzghmsOICfA
+
+    let jwt = create_jwt("test_user".to_string())
+        .expect("Failed to create JWT");
+    println!("JWT: {:?}", jwt);
+    println!("-----");
+
+    let decoded = decode_jwt(&jwt)
+        .expect("Failed to decode JWT");
+    println!("Decoded JWT: {:?}", decoded);
+    println!("-----");
+
 
     HttpServer::new(move || {
         let logger = Logger::default();

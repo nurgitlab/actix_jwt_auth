@@ -1,5 +1,6 @@
 use crate::{
-    erros::users_errors::UserError, models::users_models::{CreateUser, UpdateUser, User}
+    erros::users_errors::UserError,
+    models::users_models::{CreateUser, UpdateUser, User},
 };
 use anyhow::Result;
 use sqlx::PgPool;
@@ -16,11 +17,12 @@ impl UserRepository {
         let result = sqlx::query_as!(
             User,
             r#"
-            INSERT INTO users (username)
-            VALUES ($1)
+            INSERT INTO users (username, password)
+            VALUES ($1, $2)
             RETURNING id, username, password
             "#,
             user_data.username,
+            user_data.password,
         )
         .fetch_optional(pool)
         .await;
@@ -52,21 +54,15 @@ impl UserRepository {
         }
     }
 
-    pub async fn get_all(
-        pool: &PgPool,
-    ) -> Result<Vec<User>, UserError> {
-        let result = sqlx::query_as!(
-            User,
-            "SELECT id, username, password FROM users"
-        )
-        .fetch_all(pool)
-        .await;
+    pub async fn get_all(pool: &PgPool) -> Result<Vec<User>, UserError> {
+        let result =
+            sqlx::query_as!(User, "SELECT id, username, password FROM users")
+                .fetch_all(pool)
+                .await;
 
         match result {
             Ok(users) => {
-                log::info!(
-                    "Users successfully finded",
-                );
+                log::info!("Users successfully finded",);
                 Ok(users)
             }
             Err(e) => {

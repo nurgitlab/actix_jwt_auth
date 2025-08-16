@@ -1,5 +1,6 @@
 use crate::{
-    erros::posts_errors::PostError, models::posts_models::{CreatePost, Post, UpdatePost}
+    erros::posts_errors::PostError,
+    models::posts_models::{CreatePost, Post, UpdatePost},
 };
 use anyhow::Result;
 use sqlx::PgPool;
@@ -80,9 +81,7 @@ impl PostsRepository {
 
         match result {
             Ok(posts) => {
-                log::info!(
-                    "Posts successfully finded",
-                );
+                log::info!("Posts successfully finded",);
                 Ok(posts)
             }
             Err(e) => {
@@ -92,10 +91,7 @@ impl PostsRepository {
         }
     }
 
-    pub async fn find_by_id(
-        pool: &PgPool,
-        id: i32,
-    ) -> Result<Post, PostError> {
+    pub async fn find_by_id(pool: &PgPool, id: i32) -> Result<Post, PostError> {
         let result = sqlx::query_as!(
             Post,
             "SELECT 

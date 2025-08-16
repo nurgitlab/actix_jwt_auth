@@ -4,12 +4,12 @@ use crate::{
         CreatePost, DeletePost, GetAllPosts, GetPost, UpdatePost,
     },
     repositories::{
-        posts_repository::PostsRepository, user_repository::UserRepository,
+        posts_repository::PostsRepository,
     },
 };
 use actix_web::{
     HttpResponse, Result, delete, get, post, put,
-    web::{Data, Json, Path, ServiceConfig},
+    web::{Data, Json, ServiceConfig},
 };
 use sqlx::PgPool;
 use validator::Validate;
