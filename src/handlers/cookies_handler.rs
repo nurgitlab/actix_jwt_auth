@@ -1,5 +1,5 @@
 use crate::{
-    erros::cookies_errors::CookieError,
+    errors::cookies_errors::CookieError,
     models::cookies_models::{CookiePath, CookieResponse},
 };
 use actix_web::{

@@ -14,11 +14,6 @@ pub enum UserError {
 
     #[error("User not found")]
     NotFound,
-    // #[error("Conflict: {0}")]
-    // Conflict(String),
-
-    // #[error("Unauthorized")]
-    // Unauthorized,
 }
 
 impl ResponseError for UserError {
@@ -58,15 +53,6 @@ impl ResponseError for UserError {
                 "error": "not_found",
                 "message": "User not found"
             })),
-            // UserError::Conflict(msg) => HttpResponse::Conflict().json(json!({
-            //     "error": "conflict",
-            //     "message": msg
-            // })),
-
-            // UserError::Unauthorized => HttpResponse::Unauthorized().json(json!({
-            //     "error": "unauthorized",
-            //     "message": "Authentication required"
-            // })),
         }
     }
 }

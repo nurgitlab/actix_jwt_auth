@@ -1,5 +1,5 @@
 use crate::{
-    erros::users_errors::UserError,
+    errors::users_errors::UserError,
     models::users_models::{CreateUser, UpdateUser, UserPath},
     repositories::users_repository::UserRepository,
 };

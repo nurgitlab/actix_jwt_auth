@@ -1,5 +1,5 @@
 use crate::{
-    erros::posts_errors::PostError,
+    errors::posts_errors::PostError,
     models::posts_models::{
         CreatePost, DeletePost, GetAllPosts, GetPost, UpdatePost,
     },
