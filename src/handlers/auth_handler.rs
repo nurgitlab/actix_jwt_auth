@@ -1,6 +1,6 @@
 use actix_web::{
     HttpResponse, Result, post,
-    web::{Data, Json, Path, ServiceConfig},
+    web::{Data, Json, ServiceConfig},
 };
 use sqlx::PgPool;
 use validator::Validate;
