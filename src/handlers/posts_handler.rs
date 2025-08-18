@@ -3,9 +3,7 @@ use crate::{
     models::posts_models::{
         CreatePost, DeletePost, GetAllPosts, GetPost, UpdatePost,
     },
-    repositories::{
-        posts_repository::PostsRepository,
-    },
+    repositories::posts_repository::PostsRepository,
 };
 use actix_web::{
     HttpResponse, Result, delete, get, post, put,

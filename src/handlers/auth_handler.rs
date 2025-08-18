@@ -1,12 +1,15 @@
 use actix_web::{
-    HttpResponse, Result,
+    HttpResponse, Result, post,
     web::{Data, Json, Path, ServiceConfig},
-    post
 };
 use sqlx::PgPool;
 use validator::Validate;
 
-use crate::{errors::auth_errors::AuthError, models::auth_models::{LoginRequest, RefreshRequest}, services::auth_services::AuthService};
+use crate::{
+    errors::auth_errors::AuthError,
+    models::auth_models::{LoginRequest, RefreshRequest},
+    services::auth_services::AuthService,
+};
 
 #[post("/login")]
 pub async fn login(
@@ -14,8 +17,9 @@ pub async fn login(
     pool: Data<PgPool>,
 ) -> Result<HttpResponse, AuthError> {
     credentials.validate().map_err(AuthError::Validation)?;
-    
-    let token_pair = AuthService::login(&pool, credentials.into_inner()).await?;
+
+    let token_pair =
+        AuthService::login(&pool, credentials.into_inner()).await?;
     Ok(HttpResponse::Ok().json(token_pair))
 }
 
@@ -25,11 +29,11 @@ pub async fn refresh(
     pool: Data<PgPool>,
 ) -> Result<HttpResponse, AuthError> {
     token_data.validate().map_err(AuthError::Validation)?;
-    
-    let token_pair = AuthService::refresh(&pool, token_data.into_inner()).await?;
+
+    let token_pair =
+        AuthService::refresh(&pool, token_data.into_inner()).await?;
     Ok(HttpResponse::Ok().json(token_pair))
 }
-
 
 #[post("/logout")]
 pub async fn logout(
@@ -37,13 +41,11 @@ pub async fn logout(
     pool: Data<PgPool>,
 ) -> Result<HttpResponse, AuthError> {
     token_data.validate().map_err(AuthError::Validation)?;
-    
+
     AuthService::logout(&pool, token_data.into_inner()).await?;
     Ok(HttpResponse::Ok().json("Logged out successfully"))
 }
 
 pub fn auth_routes(cfg: &mut ServiceConfig) {
-    cfg.service(login)
-        .service(refresh)
-        .service(logout);
+    cfg.service(login).service(refresh).service(logout);
 }

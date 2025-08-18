@@ -1,6 +1,7 @@
 use actix_web::{HttpResponse, ResponseError};
 use jsonwebtoken::errors::Error as JwtError;
 use serde_json::json;
+use sqlx::Error as SqlxError;
 use thiserror::Error;
 use time::error::ComponentRange;
 use validator::ValidationErrors;
@@ -30,6 +31,9 @@ pub enum AuthError {
 
     #[error("Validation error: {0}")]
     Validation(#[from] ValidationErrors),
+
+    #[error("Database error: {0}")]
+    Database(#[from] SqlxError),
 }
 
 impl ResponseError for AuthError {
@@ -110,6 +114,14 @@ impl ResponseError for AuthError {
                 HttpResponse::InternalServerError().json(json!({
                     "error": "internal_server_error",
                     "message": "Something went wrong"
+                }))
+            }
+
+            AuthError::Database(e) => {
+                log::error!("Database error: {e}");
+                HttpResponse::InternalServerError().json(json!({
+                    "error": "database_error",
+                    "message": "Database operation failed"
                 }))
             }
         }

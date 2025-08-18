@@ -1,9 +1,10 @@
-
 use anyhow::Result;
 use sqlx::PgPool;
 use time::OffsetDateTime;
 
-use crate::{errors::auth_errors::AuthError, models::auth_models::RefreshToken};
+use crate::{
+    errors::auth_errors::AuthError, models::auth_models::RefreshToken,
+};
 
 pub struct AuthRepository;
 
@@ -22,7 +23,7 @@ impl AuthRepository {
         )
         .fetch_optional(pool)
         .await;
-        
+
         match result {
             Ok(Some(record)) => {
                 let expires_at: OffsetDateTime = record.expires_at;
@@ -54,41 +55,40 @@ impl AuthRepository {
         }
     }
 
-
     pub async fn delete_refresh_token(
-            pool: &PgPool,
-            token: &str,
-        ) -> Result<(), AuthError> {
-            let result = sqlx::query!(
-                r#"
+        pool: &PgPool,
+        token: &str,
+    ) -> Result<(), AuthError> {
+        let result = sqlx::query!(
+            r#"
                 DELETE FROM refresh_tokens
                 WHERE token = $1
                 "#,
-                token
-            )
-            .execute(pool)
-            .await;
-            
-            match result {
-                Ok(res) if res.rows_affected() > 0 => {
-                    log::info!("Refresh token deleted: {}", token);
-                    Ok(())
-                }
-                Ok(_) => {
-                    log::warn!("Refresh token not found for deletion: {}", token);
-                    Err(AuthError::RefreshTokenNotFound)
-                }
-                Err(e) => {
-                    log::error!(
-                        "Database error when deleting refresh token: {}",
-                        e
-                    );
-                    Err(AuthError::Authentication(e.to_string()))
-                }
+            token
+        )
+        .execute(pool)
+        .await;
+
+        match result {
+            Ok(res) if res.rows_affected() > 0 => {
+                log::info!("Refresh token deleted: {}", token);
+                Ok(())
+            }
+            Ok(_) => {
+                log::warn!("Refresh token not found for deletion: {}", token);
+                Err(AuthError::RefreshTokenNotFound)
+            }
+            Err(e) => {
+                log::error!(
+                    "Database error when deleting refresh token: {}",
+                    e
+                );
+                Err(AuthError::Authentication(e.to_string()))
             }
         }
+    }
 
-        pub async fn save_refresh_token(
+    pub async fn save_refresh_token(
         pool: &PgPool,
         token: &RefreshToken,
     ) -> Result<(), AuthError> {
@@ -103,13 +103,10 @@ impl AuthRepository {
         )
         .execute(pool)
         .await;
-        
+
         match result {
             Ok(_) => {
-                log::info!(
-                    "Refresh token saved for user {}",
-                    token.user_id
-                );
+                log::info!("Refresh token saved for user {}", token.user_id);
                 Ok(())
             }
             Err(e) => {

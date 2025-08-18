@@ -104,6 +104,38 @@ impl UserRepository {
         }
     }
 
+    pub async fn find_by_username(
+        pool: &PgPool,
+        username: &str,
+    ) -> Result<User, UserError> {
+        let result = sqlx::query_as!(
+            User,
+            "SELECT id, username, password FROM users WHERE username = $1",
+            username
+        )
+        .fetch_optional(pool)
+        .await;
+
+        match result {
+            Ok(Some(user)) => {
+                log::info!(
+                    "User {} successfully finded '{}'",
+                    username,
+                    user.username
+                );
+                Ok(user)
+            }
+            Ok(None) => {
+                log::error!("User {username} disappeared during finding");
+                Err(UserError::NotFound)
+            }
+            Err(e) => {
+                log::error!("Database error when finding user {username}: {e}");
+                Err(UserError::Database(e))
+            }
+        }
+    }
+
     pub async fn update(
         pool: &PgPool,
         user_id: i32,

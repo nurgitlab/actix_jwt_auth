@@ -27,7 +27,7 @@ impl Claims {
     pub fn new(user_id: i32) -> Self {
         let iat = OffsetDateTime::now_utc();
         let exp = iat + Duration::minutes(3); // Access token expires in 3 minutes
-        
+
         Claims {
             sub: user_id,
             exp: exp.unix_timestamp() as i32,
@@ -40,22 +40,15 @@ impl RefreshToken {
     pub fn new(user_id: i32) -> Self {
         let token = Uuid::new_v4().to_string();
         let expires_at = OffsetDateTime::now_utc() + Duration::days(30); // Refresh token expires in 30 days
-        
-        RefreshToken {
-            token,
-            user_id,
-            expires_at,
-        }
+
+        RefreshToken { token, user_id, expires_at }
     }
 }
-
-
-
 
 #[derive(Debug, Serialize, Deserialize, Validate)]
 pub struct LoginRequest {
     pub username: String,
-    
+
     #[validate(length(
         min = 8,
         max = 64,

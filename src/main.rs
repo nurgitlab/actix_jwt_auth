@@ -1,16 +1,19 @@
-use std::env;
 use actix_web::{App, HttpServer, middleware::Logger, web::Data};
+use std::env;
 
+use crate::{
+    handlers::ping_pong_handler::get_ping_pong,
+    migrations::apply_migrations::apply_migrations,
+};
 use sqlx::postgres::PgPoolOptions;
-use crate::{handlers::ping_pong_handler::get_ping_pong, migrations::apply_migrations::apply_migrations};
 
-mod errors; 
+mod errors;
 mod handlers;
+mod middlewares;
 mod migrations;
 mod models;
 mod repositories;
 mod services;
-mod middlewares;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
