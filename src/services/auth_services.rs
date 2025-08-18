@@ -76,12 +76,10 @@ impl AuthService {
         pool: &PgPool,
         token_data: RefreshRequest,
     ) -> Result<(), AuthError> {
-        // Удаляем refresh token из БД
         AuthRepository::delete_refresh_token(pool, &token_data.refresh_token)
             .await
     }
 
-    // Вспомогательная функция для аутентификации пользователя
     pub async fn authenticate_user(
         pool: &PgPool,
         username: &str,
