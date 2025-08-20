@@ -14,14 +14,13 @@ pub struct Post {
 }
 
 #[derive(Debug, Deserialize, Validate, Display)]
-#[display("CreatePost: message={message}, user_id={user_id}")]
+#[display("CreatePost: message={message}")]
 pub struct CreatePost {
     #[validate(length(
         min = 1,
         message = "Username must be at least 1 character long"
     ))]
     pub message: String,
-    pub user_id: i32,
 }
 
 #[derive(Debug, Deserialize, Validate, Display)]
@@ -38,15 +37,9 @@ pub struct GetPost {
 }
 
 #[derive(Debug, Deserialize, Validate, Display)]
-#[display("UpdatePost: id={id}, message={message}, user_id={user_id}")]
+#[display("UpdatePost: message={message}")]
 pub struct UpdatePost {
-    pub id: i32,
-    #[validate(length(
-        min = 1,
-        message = "Username must be at least 1 character long"
-    ))]
     pub message: String,
-    pub user_id: i32,
 }
 
 #[derive(Debug, Deserialize, Validate, Display)]
@@ -54,3 +47,10 @@ pub struct UpdatePost {
 pub struct DeletePost {
     pub id: i32,
 }
+
+#[derive(Debug, Deserialize, Validate)]
+pub struct PostsPath {
+    #[validate(range(min = 1, message = "Post ID must be positive"))]
+    pub post_id: i32,
+}
+

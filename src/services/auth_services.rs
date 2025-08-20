@@ -2,11 +2,8 @@ use jsonwebtoken::{
     DecodingKey, EncodingKey, Header, Validation, decode, encode,
 };
 use sqlx::PgPool;
-use time::OffsetDateTime;
-use uuid::Uuid;
-
 use crate::{
-    errors::{auth_errors::AuthError, users_errors::UserError},
+    errors::{auth_errors::AuthError},
     models::auth_models::{
         Claims, LoginRequest, RefreshRequest, RefreshToken, TokenPair,
     },

@@ -1,16 +1,22 @@
 use crate::{
     errors::posts_errors::PostError,
-    models::{auth_models::Claims, posts_models::{CreatePost, DeletePost, GetAllPosts, GetPost, UpdatePost}},
+    models::{
+        auth_models::Claims,
+        posts_models::{
+            CreatePost, GetAllPosts, PostsPath, UpdatePost
+        },
+    },
     repositories::posts_repository::PostsRepository,
 };
 use actix_web::{
-    delete, get, post, put, web::{scope, Data, Json, Path, ServiceConfig}, HttpMessage, HttpRequest, HttpResponse, Result
+    HttpMessage, HttpRequest, HttpResponse, Result, delete, get, post, put,
+    web::{Data, Json, Path, ServiceConfig, scope},
 };
-use actix_web_httpauth::{extractors::bearer::BearerAuth, middleware::HttpAuthentication};
+use actix_web_httpauth::{ middleware::HttpAuthentication,};
 use sqlx::PgPool;
 use validator::Validate;
 
-// Хелпер для извлечения user_id из токена
+/// Extracts user ID from the request's JWT.
 fn extract_user_id(req: &HttpRequest) -> Result<i32, PostError> {
     req.extensions()
         .get::<Claims>()
@@ -27,55 +33,56 @@ pub async fn create_post(
     let user_id = extract_user_id(&req)?;
     post_data.validate().map_err(PostError::Validation)?;
 
-    // Проверяем, что пользователь создает пост для себя
-    if post_data.user_id != user_id {
-        return Err(PostError::NotFound);
-    }
-
-    let post = PostsRepository::create(&pool, post_data.into_inner()).await?;
+    let post = PostsRepository::create(&pool, post_data.into_inner(), user_id).await?;
     Ok(HttpResponse::Ok().json(post))
 }
 
 #[get("/all")]
 pub async fn get_all_posts(
-    req: HttpRequest,
     pool: Data<PgPool>,
+    post_data: Json<GetAllPosts>,
 ) -> Result<HttpResponse, PostError> {
-    let user_id = extract_user_id(&req)?;
-    let posts = PostsRepository::get_all(&pool, user_id).await?;
+    post_data.validate().map_err(PostError::Validation)?;
+    let posts = PostsRepository::get_all(&pool, post_data.user_id).await?;
+    log::info!("Found {} posts for user {}", posts.len(), post_data.user_id);
     Ok(HttpResponse::Ok().json(posts))
 }
 
 #[get("/{id}")]
 pub async fn get_post(
-    req: HttpRequest,
     path: Path<i32>,
     pool: Data<PgPool>,
 ) -> Result<HttpResponse, PostError> {
-    let _user_id = extract_user_id(&req)?; // Проверяем авторизацию
+    // let _user_id = extract_user_id(&req)?; // Chech authentication, but not used here
     let post_id = path.into_inner();
     let post = PostsRepository::find_by_id(&pool, post_id).await?;
     Ok(HttpResponse::Ok().json(post))
 }
 
-#[put("/{id}")]
+#[put("/{post_id}")]
 pub async fn update_post(
     req: HttpRequest,
-    path: Path<i32>,
+    path: Path<PostsPath>,
     post_data: Json<UpdatePost>,
     pool: Data<PgPool>,
 ) -> Result<HttpResponse, PostError> {
+    println!("Updating post with ID: {}", path.post_id);
     let user_id = extract_user_id(&req)?;
     post_data.validate().map_err(PostError::Validation)?;
+    path.validate().map_err(PostError::Validation)?;
 
-    // Проверяем, что пользователь обновляет свой пост
-    let post_id = path.into_inner();
+    
+    let post_id = path.post_id;
+    println!("Updating post with ID: {}", post_id);
     let post = PostsRepository::find_by_id(&pool, post_id).await?;
     if post.user_id != user_id {
-        return Err(PostError::NotFound);
+        return Err(PostError::Unauthorized(
+            "You can only update your own posts".to_string(),
+        ));
     }
 
-    let updated_post = PostsRepository::update(&pool, post_id, post_data.into_inner()).await?;
+    let updated_post =
+        PostsRepository::update(&pool, post_id, post_data.into_inner()).await?;
     Ok(HttpResponse::Ok().json(updated_post))
 }
 
@@ -88,10 +95,11 @@ pub async fn delete_post(
     let user_id = extract_user_id(&req)?;
     let post_id = path.into_inner();
 
-    // Проверяем, что пользователь удаляет свой пост
     let post = PostsRepository::find_by_id(&pool, post_id).await?;
     if post.user_id != user_id {
-        return Err(PostError::NotFound);
+        return Err(PostError::Unauthorized(
+            "You can only delete your own posts".to_string(),
+        ));
     }
 
     PostsRepository::delete(&pool, post_id).await?;
@@ -99,15 +107,20 @@ pub async fn delete_post(
 }
 
 pub fn posts_routes(cfg: &mut ServiceConfig) {
-    let auth = HttpAuthentication::bearer(crate::middlewares::auth_middleware::auth_middleware_validator);
+    let auth = HttpAuthentication::bearer(
+        crate::middlewares::auth_middleware::auth_middleware_validator,
+    );
 
     cfg.service(
         scope("/posts")
-            .wrap(auth)
-            .service(create_post)
-            .service(get_all_posts)
-            .service(get_post)
-            .service(update_post)
-            .service(delete_post),
+                .service(get_all_posts)
+                .service(get_post)
+                .service(
+                    scope("")
+                        .wrap(auth)
+                        .service(create_post)
+                        .service(update_post)
+                        .service(delete_post)
+                ),
     );
 }

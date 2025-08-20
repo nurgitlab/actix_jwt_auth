@@ -2,9 +2,7 @@
 A high-performance CRUD API built with Rust using the Actix-Web framework and PostgreSQL. This API demonstrates how to implement basic CRUD operations following REST conventions.
 
 Todo:
-1. posts CRUD
 2. combine Errors
-3. add JWT authentication
 
 ## Features
 - Create, Read, Update, and Delete operations
@@ -39,6 +37,8 @@ Todo:
 │   ├── handlers/           # Request handlers
 │   ├── migrations/         # Applying migrations
 │   ├── models/             # Data models
+│   ├── services/           # Layer for business logic
+│   ├── middlewares/        # Custom middleware for request processing
 │   ├── repositories/       # Database connection setup
 │   └── errors/             # Custom error handling
 ├── migrations/             # Database migrations (SQL)

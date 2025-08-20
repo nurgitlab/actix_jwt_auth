@@ -11,6 +11,7 @@ impl PostsRepository {
     pub async fn create(
         pool: &PgPool,
         new_post: CreatePost,
+        user_id: i32
     ) -> Result<Post, PostError> {
         //TODO Need to create validation before INSERT in DB (because PSQL creating index in both cases)
 
@@ -27,7 +28,7 @@ impl PostsRepository {
             updated_at
             "#,
             new_post.message,
-            new_post.user_id
+            user_id
         )
         .fetch_optional(pool)
         .await;

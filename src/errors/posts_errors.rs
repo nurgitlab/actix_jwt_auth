@@ -14,6 +14,9 @@ pub enum PostError {
 
     #[error("Post not found")]
     NotFound,
+
+    #[error("Unauthorized: {0}")]
+    Unauthorized(String),
 }
 
 impl ResponseError for PostError {
@@ -53,6 +56,14 @@ impl ResponseError for PostError {
                 "error": "not_found",
                 "message": "Post not found"
             })),
+
+            PostError::Unauthorized(message) => {
+                log::warn!("Unauthorized: {}", message);
+                HttpResponse::Unauthorized().json(json!({
+                    "error": "unauthorized",
+                    "message": message
+                }))
+            }
         }
     }
 }

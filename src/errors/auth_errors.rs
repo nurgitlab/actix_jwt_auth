@@ -23,11 +23,11 @@ pub enum AuthError {
     #[error("Refresh token not found")]
     RefreshTokenNotFound,
 
-    #[error("Unauthorized: {0}")]
-    Unauthorized(String),
+    // #[error("Unauthorized: {0}")]
+    // Unauthorized(String),
 
-    #[error("Internal server error")]
-    InternalServerError,
+    // #[error("Internal server error")]
+    // InternalServerError,
 
     #[error("Validation error: {0}")]
     Validation(#[from] ValidationErrors),
@@ -101,21 +101,21 @@ impl ResponseError for AuthError {
                 }))
             }
 
-            AuthError::Unauthorized(message) => {
-                log::warn!("Unauthorized: {}", message);
-                HttpResponse::Unauthorized().json(json!({
-                    "error": "unauthorized",
-                    "message": message
-                }))
-            }
+            // AuthError::Unauthorized(message) => {
+            //     log::warn!("Unauthorized: {}", message);
+            //     HttpResponse::Unauthorized().json(json!({
+            //         "error": "unauthorized",
+            //         "message": message
+            //     }))
+            // }
 
-            AuthError::InternalServerError => {
-                log::error!("Internal server error");
-                HttpResponse::InternalServerError().json(json!({
-                    "error": "internal_server_error",
-                    "message": "Something went wrong"
-                }))
-            }
+            // AuthError::InternalServerError => {
+            //     log::error!("Internal server error");
+            //     HttpResponse::InternalServerError().json(json!({
+            //         "error": "internal_server_error",
+            //         "message": "Something went wrong"
+            //     }))
+            // }
 
             AuthError::Database(e) => {
                 log::error!("Database error: {e}");
