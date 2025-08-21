@@ -58,7 +58,7 @@ The DB is only hit for login, refresh, and logout—not on every request. This m
 │   ├── migrations/         # Applying migrations
 │   ├── models/             # Data models
 │   ├── services/           # Layer for business logic
-│   ├── middlewares/        # Custom middleware for request processing
+│   ├── middlewares/        # Custom middleware
 │   ├── repositories/       # Database connection setup
 │   └── errors/             # Custom error handling
 ├── migrations/             # Database migrations (SQL)
